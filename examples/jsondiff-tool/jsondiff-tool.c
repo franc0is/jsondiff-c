@@ -9,12 +9,14 @@ int
 main(int argc, char **argv)
 {
     struct arg_lit *help;
-    struct arg_str *app_name, *api_key, *user, *passwd;
+    struct arg_str *a_str, *b_str;
     struct arg_end *end;
 
     /* the global arg_xxx structs are initialised within the argtable */
     void *argtable[] = {
         help     = arg_litn(NULL, "help", 0, 1, "display this help and exit"),
+        a_str    = arg_str1("a", "json_a", "JSON", "the json string to diff against"),
+        b_str    = arg_str1("b", "json_b", "JSON", "the json string to diff"),
         end      = arg_end(20),
     };
 
@@ -43,7 +45,22 @@ main(int argc, char **argv)
         goto exit;
     }
 
+    printf("A is %s\nB is %s\n", a_str->sval[0], b_str->sval[0]);
+
+    json_t *a_json = json_loads(a_str->sval[0], JSON_DECODE_ANY, NULL);
+    json_t *b_json = json_loads(b_str->sval[0], JSON_DECODE_ANY, NULL);
+    if (a_json == NULL || b_json == NULL) {
+        fprintf(stderr, "malformed JSON, got: %s and %s\n", a_str->sval[0], b_str->sval[0]);
+        exitcode = 1;
+        goto exit;
+    }
+
+    json_t *diff = jsondiff_compare(a_json, b_json, 0);
+    printf("Diff is %s\n", json_dumps(diff, JSON_ENCODE_ANY));
+
 exit:
+    json_decref(a_json);
+    json_decref(b_json);
     arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));
     return exitcode;
 }
