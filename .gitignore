@@ -1,6 +1,13 @@
 # Prerequisites
 *.d
 
+# cscope/ctags
+tags
+cscope.out
+
+# build folder
+build
+
 # Object files
 *.o
 *.ko
