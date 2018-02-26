@@ -15,12 +15,12 @@ main(int argc, char **argv)
     /* the global arg_xxx structs are initialised within the argtable */
     void *argtable[] = {
         help     = arg_litn(NULL, "help", 0, 1, "display this help and exit"),
-        a_str    = arg_str1("a", "json_a", "JSON", "the json string to diff against"),
-        b_str    = arg_str1("b", "json_b", "JSON", "the json string to diff"),
+        a_str    = arg_str1("a", "json_a", "JSON", "the json string to diff"),
+        b_str    = arg_str1("b", "json_b", "JSON", "the json string to diff against"),
         end      = arg_end(20),
     };
 
-    const char* progname = "simple";
+    const char* progname = "jsondiff";
     int exitcode = 0;
     int nerrors = arg_parse(argc,argv,argtable);
 
