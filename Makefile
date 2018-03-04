@@ -1,5 +1,5 @@
-CC := gcc-6
-LD := gcc-6
+CC := g++-7
+LD := g++-7
 RM := rm
 MKDIR := mkdir
 AR := ar crv
@@ -18,15 +18,15 @@ endif
 
 IGNORE_ERRORS = >/dev/null 2>&1 || true
 
-SOURCES := src/jsondiff.c
+SOURCES := src/jsondiff.cpp
 
-INCLUDES := . src
+INCLUDES := . src 3rdparty/diff-match-patch-cpp-stl-master
 CFLAGS :=
 LDFLAGS :=
 
 # Include libs here
 
-OBJS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(SOURCES))
+OBJS := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(SOURCES))
 INC := $(addprefix -I,$(INCLUDES))
 DEFS := $(addprefix -D,$(DEFINES))
 
@@ -34,7 +34,7 @@ DEFS := $(addprefix -D,$(DEFINES))
 # Rules
 #
 
-$(BUILD_DIR)/%.o: %.c
+$(BUILD_DIR)/%.o: %.cpp
 	@echo Compiling $(notdir $<)
 	$(NO_ECHO)$(MKDIR) -p $(dir $@)
 	$(NO_ECHO)$(CC) $(CFLAGS) $(INC) $(DEFS) -c $< -o $@

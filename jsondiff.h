@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <jansson.h>
 
 enum jsondiff_flag {
@@ -11,3 +15,7 @@ jsondiff_compare(json_t *a, json_t *b, int flags);
 
 json_t *
 jsondiff_apply(json_t *json, json_t *diff, int flags);
+
+#ifdef __cplusplus
+}
+#endif

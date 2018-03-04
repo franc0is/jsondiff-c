@@ -1,11 +1,18 @@
 #include <assert.h>
 #include <jsondiff.h>
 #include <stdbool.h>
+#include <diff_match_patch.h>
+
+#include <string>
+
+using namespace std;
+
+diff_match_patch<string> dmp;
 
 static json_t *
-prv_replace_op(json_t *new)
+prv_replace_op(json_t *new_object)
 {
-    return json_pack("{s:s, s:O}", "o", "r", "v", new);
+    return json_pack("{s:s, s:O}", "o", "r", "v", new_object);
 }
 
 static json_t *
@@ -15,9 +22,9 @@ prv_delete_op(void)
 }
 
 static json_t *
-prv_add_op(json_t *new)
+prv_add_op(json_t *new_object)
 {
-    return json_pack("{s:s, s:O}", "o", "+", "v", new);
+    return json_pack("{s:s, s:O}", "o", "+", "v", new_object);
 }
 
 static json_t *
@@ -38,8 +45,19 @@ prv_integer_diff(json_t *a, json_t *b, int flags)
 static json_t *
 prv_string_diff(json_t *a, json_t *b, int flags)
 {
-    // FIXME
-    return prv_replace_op(b);
+    assert(json_is_string(a) && json_is_string(b));
+    string stringa = json_string_value(a);
+    string stringb = json_string_value(b);
+    auto diffs = dmp.diff_main(stringa, stringb);
+    if (diffs.size() > 2) {
+        dmp.diff_cleanupEfficiency(diffs);
+    }
+    if (diffs.size() > 0) {
+        string s = dmp.diff_toDelta(diffs);
+        return json_pack("{s:s s:s}", "o", "d", "v", s.c_str());
+    } else {
+        return NULL;
+    }
 }
 
 static json_t *

@@ -1,5 +1,5 @@
-CC := gcc-6
-LD := gcc-6
+CC := g++-7
+LD := g++-7
 RM := rm
 MKDIR := mkdir
 AR := gar
