@@ -8,8 +8,6 @@
 
 using namespace std;
 
-#define WTF() assert(1);
-
 diff_match_patch<string> dmp;
 
 static json_t *
