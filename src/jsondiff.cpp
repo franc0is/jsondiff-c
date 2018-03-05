@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <jsondiff.h>
 #include <math.h>
+#include <set>
 #include <stdbool.h>
 #include <string>
 #include <diff_match_patch.h>
@@ -160,14 +161,35 @@ prv_array_diff(json_t *a, json_t *b, int flags)
 static json_t *
 prv_array_apply(json_t *a, json_t *diff, int flags)
 {
-    // TODO
-    return NULL;
+    json_t *c = json_deep_copy(a);
+
+    const char *key;
+    json_t *op;
+    set<int> to_delete;
+    json_object_foreach(diff, key, op) {
+        const char *op_type = json_string_value(json_object_get(op, "o"));
+        json_int_t index = strtoll(key, NULL, 10);
+        if (op_type[0] == '-') {
+            to_delete.insert(index);
+        } else {
+            json_t *old_val = json_array_get(c, index);
+            json_t *new_val = jsondiff_apply(old_val, op, flags);
+            json_array_set(c, index, new_val);
+        }
+    }
+
+    for (auto delete_iter = to_delete.rbegin(); delete_iter != to_delete.rend(); ++delete_iter) {
+        json_array_remove(c, *delete_iter);
+    }
+
+    return c;
 }
 
 static json_t *
 prv_array_apply_dmp(json_t *a, json_t *diff, int flags)
 {
     // TODO
+    printf("DMP array apply not implemented\n");
     return NULL;
 }
 
