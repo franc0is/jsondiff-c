@@ -176,6 +176,8 @@ prv_array_apply(json_t *a, json_t *diff, int flags)
         }
     }
 
+    // We apply all delete operations at the end, and use a reverse iterator 
+    // to avoid shifting the index of all other ops as we remove items.
     for (auto delete_iter = to_delete.rbegin(); delete_iter != to_delete.rend(); ++delete_iter) {
         json_array_remove(c, *delete_iter);
     }

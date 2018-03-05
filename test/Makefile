@@ -5,6 +5,7 @@ MKDIR := mkdir
 AR := ar crv
 
 BUILD_DIR := build
+PROJECT := jsondiff_tests
 
 ifneq ($(VERBOSE),)
   NO_ECHO=
@@ -12,17 +13,17 @@ else
   NO_ECHO=@
 endif
 
-ifneq ($(DEBUG),)
-  DEFINES = DEBUG
-endif
-
 IGNORE_ERRORS = >/dev/null 2>&1 || true
 
-SOURCES := src/jsondiff.cpp
+SOURCES := jsondiff_tests.cpp
 
-INCLUDES := . src 3rdparty/diff-match-patch-cpp-stl-master
-CFLAGS := -g
-LDFLAGS :=
+INCLUDES := .. \
+            ../3rdparty/catch-2.1.2
+
+LIBRARIES := ../build/libjsondiff.a
+
+CFLAGS :=
+LDFLAGS := -ljansson
 
 # Include libs here
 
@@ -43,17 +44,16 @@ $(BUILD_DIR)/%.o: %.cpp
 # Targets
 #
 
-$(BUILD_DIR)/libjsondiff.a: $(OBJS)
-	@echo Packaging $@
-	$(NO_ECHO)$(AR) $@ $(OBJS)
+all: $(BUILD_DIR)/$(PROJECT)
+	@echo Running $^
+	$(NO_ECHO)./$^
 
-test: $(BUILD_DIR)/libjsondiff.a
-	$(NO_ECHO)$(MAKE) -C test
+$(BUILD_DIR)/$(PROJECT): $(OBJS) $(LIBRARIES)
+	@echo Linking $@
+	$(NO_ECHO)$(LD) $(LDFLAGS) -o $@ $^
 
 clean:
-	$(NO_ECHO)$(IGNORE_ERRORS)$(RM) -r $(BUILD_DIR)
-	$(NO_ECHO)$(IGNORE_ERRORS)$(MAKE) clean -C test
-	$(NO_ECHO)$(IGNORE_ERRORS)$(MAKE) clean -C example/jsondiff-tool
+	$(NO_ECHO)$(RM) -r $(BUILD_DIR)
 
+.PHONY: clean all
 
-.PHONY: clean test
