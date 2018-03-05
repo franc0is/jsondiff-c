@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <jsondiff.h>
+#include <math.h>
 #include <stdbool.h>
-#include <diff_match_patch.h>
-
 #include <string>
+#include <diff_match_patch.h>
 
 using namespace std;
 
@@ -91,11 +91,74 @@ prv_object_diff(json_t *a, json_t *b, int flags)
     return prv_modify_op(changes);
 }
 
+static int
+prv_array_common_prefix(json_t *a, json_t *b)
+{
+    int minlen = min(json_array_size(a), json_array_size(b));
+
+    for (int i = 0; i < minlen; ++i) {
+        json_t *val_a = json_array_get(a, i);
+        json_t *val_b = json_array_get(b, i);
+        if (!json_equal(val_a, val_b)) {
+            return i;
+        }
+    }
+
+    return minlen;
+}
+
+static int
+prv_array_common_suffix(json_t *a, json_t *b)
+{
+    int len_a = json_array_size(a);
+    int len_b = json_array_size(b);
+    int minlen = min(len_a, len_b);
+
+    for (int i = 0; i < minlen; ++i) {
+        json_t *val_a = json_array_get(a, len_a - i - 1);
+        json_t *val_b = json_array_get(b, len_b - i - 1);
+        if (!json_equal(val_a, val_b)) {
+            return i;
+        }
+    }
+
+    return minlen;
+}
+
 static json_t *
 prv_array_diff(json_t *a, json_t *b, int flags)
 {
-    // FIXME
-    return prv_replace_op(b);
+    assert(json_is_array(a) && json_is_array(b));
+
+    // Optimization: don't go over common prefix / suffix
+    // Note: we could do something much smarter here
+    int prefix_len = prv_array_common_prefix(a, b);
+    int suffix_len = prv_array_common_suffix(a, b);
+    int start = prefix_len;
+    int end_a = json_array_size(a) - suffix_len;
+    int end_b = json_array_size(b) - suffix_len;
+    int end = max(end_a, end_b);
+
+    json_t *changes = json_object();
+    char key[11] = {0}; // 2^32 - 1 is 10 digits, plus null terminator
+    json_t *val_a = NULL;
+    json_t *val_b = NULL;
+
+    for (int i = start; i < end; ++i) {
+        snprintf(key, sizeof(key), "%d", i);
+        if (i < end_a && i < end_b) {
+            val_a = json_array_get(a, i);
+            val_b = json_array_get(b, i);
+            json_object_set(changes, key, jsondiff_compare(val_a, val_b, flags));
+        } else if (i < end_a) {
+            json_object_set(changes, key, prv_delete_op());
+        } else if (i < end_b) {
+            val_b = json_array_get(b, i);
+            json_object_set(changes, key, prv_add_op(val_b));
+        }
+    }
+
+    return json_pack("{s:s, s:O}", "o", "L", "v", changes);
 }
 
 json_t *
