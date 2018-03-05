@@ -11,7 +11,7 @@ enum jsondiff_flag {
 };
 
 json_t *
-jsondiff_compare(json_t *a, json_t *b, int flags);
+jsondiff_diff(json_t *a, json_t *b, int flags);
 
 json_t *
 jsondiff_apply(json_t *json, json_t *diff, int flags);

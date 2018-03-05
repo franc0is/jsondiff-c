@@ -7,12 +7,14 @@
 
 using namespace std;
 
+#define WTF() assert(1);
+
 diff_match_patch<string> dmp;
 
 static json_t *
 prv_replace_op(json_t *new_object)
 {
-    return json_pack("{s:s, s:O}", "o", "r", "v", new_object);
+    return json_pack("{s:s, s:o}", "o", "r", "v", new_object);
 }
 
 static json_t *
@@ -24,13 +26,7 @@ prv_delete_op(void)
 static json_t *
 prv_add_op(json_t *new_object)
 {
-    return json_pack("{s:s, s:O}", "o", "+", "v", new_object);
-}
-
-static json_t *
-prv_modify_op(json_t *changes)
-{
-    return json_pack("{s:s, s:O}", "o", "M", "v", changes);
+    return json_pack("{s:s, s:o}", "o", "+", "v", new_object);
 }
 
 static json_t *
@@ -38,7 +34,7 @@ prv_integer_diff(json_t *a, json_t *b, int flags)
 {
     assert(json_is_integer(a) && json_is_integer(b));
 
-    int delta = json_integer_value(b) - json_integer_value(a);
+    json_int_t delta = json_integer_value(b) - json_integer_value(a);
     return json_pack("{s:s, s:i}", "o", "I", "v", delta);
 }
 
@@ -77,7 +73,7 @@ prv_object_diff(json_t *a, json_t *b, int flags)
         json_t *b_value = json_object_get(b, key);
         if (!b_value) {
             json_object_set(changes, key, prv_delete_op());
-        } else if ((diff = jsondiff_compare(value, b_value, flags))) {
+        } else if ((diff = jsondiff_diff(value, b_value, flags))) {
             json_object_set(changes, key, diff);
             json_object_del(b_copy, key);
         }
@@ -88,7 +84,7 @@ prv_object_diff(json_t *a, json_t *b, int flags)
         json_object_set(changes, key, prv_add_op(value));
     }
 
-    return prv_modify_op(changes);
+    return json_pack("{s:s:, s:o}", "o", "O", "v", changes);
 }
 
 static int
@@ -149,7 +145,7 @@ prv_array_diff(json_t *a, json_t *b, int flags)
         if (i < end_a && i < end_b) {
             val_a = json_array_get(a, i);
             val_b = json_array_get(b, i);
-            json_object_set(changes, key, jsondiff_compare(val_a, val_b, flags));
+            json_object_set(changes, key, jsondiff_diff(val_a, val_b, flags));
         } else if (i < end_a) {
             json_object_set(changes, key, prv_delete_op());
         } else if (i < end_b) {
@@ -158,18 +154,85 @@ prv_array_diff(json_t *a, json_t *b, int flags)
         }
     }
 
-    return json_pack("{s:s, s:O}", "o", "L", "v", changes);
+    return json_pack("{s:s, s:o}", "o", "L", "v", changes);
+}
+
+static json_t *
+prv_array_apply(json_t *a, json_t *diff, int flags)
+{
+    // TODO
+    return NULL;
+}
+
+static json_t *
+prv_array_apply_dmp(json_t *a, json_t *diff, int flags)
+{
+    // TODO
+    return NULL;
+}
+
+static json_t *
+prv_object_apply(json_t *a, json_t *diff, int flags)
+{
+    json_t *c = json_deep_copy(a);
+    const char *key;
+    json_t *op;
+    json_object_foreach(diff, key, op) {
+        // XXX more validation?
+        const char *op_type = json_string_value(json_object_get(op, "o"));
+        if (op_type[0] == '-') {
+            json_object_del(c, key);
+        } else {
+            json_t *old_val = json_object_get(c, key);
+            json_t *new_val = jsondiff_apply(old_val, op, flags);
+            json_object_set(c, key, new_val);
+        }
+    }
+
+    return c;
+}
+
+static json_t *
+prv_int_apply(json_t *a, json_t *diff, int flags)
+{
+    assert(json_is_integer(a) && json_is_integer(diff));
+
+    json_int_t a_val = json_integer_value(a);
+    json_int_t diff_val = json_integer_value(diff);
+
+    return json_integer(a_val + diff_val);
+}
+
+static json_t *
+prv_string_apply(json_t *a, json_t *diff, int flags)
+{
+    assert(json_is_string(a) && json_is_string(diff));
+
+    string a_str = json_string_value(a);
+    string diff_str = json_string_value(diff);
+    auto dmp_diffs  = dmp.diff_fromDelta(a_str, diff_str);
+    auto dmp_patches = dmp.patch_make(a_str, dmp_diffs);
+    auto dmp_results = dmp.patch_apply(dmp_patches, a_str);
+    return json_string(dmp_results.first.c_str());
 }
 
 json_t *
-jsondiff_compare(json_t *a, json_t *b, int flags)
+jsondiff_diff(json_t *a, json_t *b, int flags)
 {
-    int a_type = json_typeof(a);
-    int b_type = json_typeof(b);
+    if (a == NULL) {
+        return NULL;
+    }
+
+    if (b == NULL) {
+        return prv_delete_op();
+    }
 
     if (json_equal(a, b)) {
         return NULL;
     }
+
+    int a_type = json_typeof(a);
+    int b_type = json_typeof(b);
 
     if (a_type != b_type &&
         !(json_is_boolean(a) && json_is_boolean(b))) {
@@ -180,21 +243,16 @@ jsondiff_compare(json_t *a, json_t *b, int flags)
     switch (a_type) {
         case JSON_OBJECT:
             return prv_object_diff(a, b, flags);
-            break;
         case JSON_ARRAY:
             return prv_array_diff(a, b, flags);
-            break;
         case JSON_STRING:
             return prv_string_diff(a, b, flags);
-            break;
         case JSON_INTEGER:
             return prv_integer_diff(a, b, flags);
-            break;
         case JSON_REAL:
         case JSON_TRUE:
         case JSON_FALSE:
             return prv_replace_op(b);
-            break;
         case JSON_NULL:
             assert(false); // two NULLs should get caught by the 'json_equal' case
             break;
@@ -206,5 +264,30 @@ jsondiff_compare(json_t *a, json_t *b, int flags)
 json_t *
 jsondiff_apply(json_t *json, json_t *diff, int flags)
 {
-    return NULL;
+    assert(diff && json_is_object(diff));
+
+    const char *op = json_string_value(json_object_get(diff, "o"));
+    json_t *diff_data = json_object_get(diff, "v");
+    switch (op[0]) {
+        case '-':
+            return NULL;
+        case 'r':
+        case '+':
+            return diff_data;
+        case 'I':
+            return prv_int_apply(json, diff_data, flags);
+        case 'L':
+            return prv_array_apply(json, diff_data, flags);
+        case 'O':
+            return prv_object_apply(json, diff_data, flags);
+        case 'd':
+            if (op[1] == '\0') {
+                return prv_string_apply(json, diff_data, flags);
+            } else if (op[1] == 'L') {
+                return prv_array_apply_dmp(json, diff_data, flags);
+            }
+        default:
+            printf("Unrecognized op: %s\n", op);
+            return NULL;
+    }
 }

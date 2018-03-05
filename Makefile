@@ -21,7 +21,7 @@ IGNORE_ERRORS = >/dev/null 2>&1 || true
 SOURCES := src/jsondiff.cpp
 
 INCLUDES := . src 3rdparty/diff-match-patch-cpp-stl-master
-CFLAGS :=
+CFLAGS := -g
 LDFLAGS :=
 
 # Include libs here

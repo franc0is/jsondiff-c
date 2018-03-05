@@ -23,6 +23,10 @@ main(int argc, char **argv)
     const char* progname = "jsondiff";
     int exitcode = 0;
     int nerrors = arg_parse(argc,argv,argtable);
+    json_t *a_json = NULL;
+    json_t *b_json = NULL;
+    json_t *c_json = NULL;
+    json_t *diff = NULL;
 
     /* special case: '--help' takes precedence over error reporting */
     if (help->count > 0)
@@ -47,16 +51,30 @@ main(int argc, char **argv)
 
     printf("A is %s\nB is %s\n", a_str->sval[0], b_str->sval[0]);
 
-    json_t *a_json = json_loads(a_str->sval[0], JSON_DECODE_ANY, NULL);
-    json_t *b_json = json_loads(b_str->sval[0], JSON_DECODE_ANY, NULL);
+    a_json = json_loads(a_str->sval[0], JSON_DECODE_ANY, NULL);
+    b_json = json_loads(b_str->sval[0], JSON_DECODE_ANY, NULL);
     if (a_json == NULL || b_json == NULL) {
         fprintf(stderr, "malformed JSON, got: %s and %s\n", a_str->sval[0], b_str->sval[0]);
         exitcode = 1;
         goto exit;
     }
 
-    json_t *diff = jsondiff_compare(a_json, b_json, 0);
+    diff = jsondiff_diff(a_json, b_json, 0);
     printf("Diff is %s\n", json_dumps(diff, JSON_ENCODE_ANY));
+
+    // XXX put behind different flags
+    c_json = jsondiff_apply(a_json, diff, 0);
+    printf("Applied to A: %s\n", json_dumps(c_json, JSON_ENCODE_ANY));
+
+    if (json_equal(c_json, b_json)) {
+        printf("All's good in the hood\n");
+    } else {
+        printf("Results do not match:\n"
+               "\tExpected: %s\n"
+               "\tGot: %s\n",
+               json_dumps(b_json, JSON_ENCODE_ANY),
+               json_dumps(c_json, JSON_ENCODE_ANY));
+    }
 
 exit:
     json_decref(a_json);
