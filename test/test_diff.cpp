@@ -5,14 +5,14 @@
 #include <jansson.h>
 #include <string>
 
-#define A_B_DIFF_TEST(_a, _b, _diff, _description) \
+#define A_B_DIFF_TEST(_a, _b, _diff, _description)                      \
 TEST_CASE(_description) {                                               \
     json_t *a = json_loads(_a, JSON_ENCODE_ANY, NULL);                  \
-    REQUIRE(a);                                                 \
+    REQUIRE(a);                                                         \
     json_t *b = json_loads(_b, JSON_ENCODE_ANY, NULL);                  \
-    REQUIRE(b);                                                 \
+    REQUIRE(b);                                                         \
     json_t *expected = json_loads(_diff, JSON_ENCODE_ANY, NULL);        \
-    REQUIRE(expected);                                          \
+    REQUIRE(expected);                                                  \
     json_t *diff = jsondiff_diff(a, b, 0);                              \
     std::string s1 = json_dumps(diff, JSON_DECODE_ANY);                 \
     std::string s2 = json_dumps(expected, JSON_DECODE_ANY);             \

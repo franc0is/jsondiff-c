@@ -15,7 +15,8 @@ endif
 
 IGNORE_ERRORS = >/dev/null 2>&1 || true
 
-SOURCES := jsondiff_tests.cpp
+SOURCES := test_diff.cpp \
+           test_apply.cpp
 
 INCLUDES := .. \
             ../3rdparty/doctest-1.2.7/doctest
