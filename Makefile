@@ -51,9 +51,9 @@ test: $(BUILD_DIR)/libjsondiff.a
 	$(NO_ECHO)$(MAKE) -C test
 
 clean:
-	$(NO_ECHO)$(IGNORE_ERRORS)$(RM) -r $(BUILD_DIR)
-	$(NO_ECHO)$(IGNORE_ERRORS)$(MAKE) clean -C test
-	$(NO_ECHO)$(IGNORE_ERRORS)$(MAKE) clean -C example/jsondiff-tool
+	$(NO_ECHO)$(RM) -r $(BUILD_DIR) $(IGNORE_ERRORS)
+	$(NO_ECHO)$(MAKE) -C test clean $(IGNORE_ERRORS)
+	$(NO_ECHO)$(MAKE) -C example/jsondiff-tool clean $(IGNORE_ERRORS)
 
 
 .PHONY: clean test
