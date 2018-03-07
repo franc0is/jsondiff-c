@@ -22,7 +22,7 @@ INCLUDES := .. \
 
 LIBRARIES := ../build/libjsondiff.a
 
-CFLAGS :=
+CFLAGS := -g
 LDFLAGS := -ljansson
 
 # Include libs here

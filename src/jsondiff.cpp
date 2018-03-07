@@ -67,12 +67,12 @@ prv_object_diff(json_t *a, json_t *b, int flags)
     json_t *changes = json_object();
     const char *key;
     json_t *value;
-    json_t *diff = NULL;
     json_object_foreach(a, key, value) {
         json_t *b_value = json_object_get(b, key);
         if (!b_value) {
             json_object_set(changes, key, prv_delete_op());
-        } else if ((diff = jsondiff_diff(value, b_value, flags))) {
+        } else {
+            json_t *diff = jsondiff_diff(value, b_value, flags);
             json_object_set(changes, key, diff);
             json_object_del(b_copy, key);
         }
