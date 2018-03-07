@@ -18,11 +18,11 @@ IGNORE_ERRORS = >/dev/null 2>&1 || true
 SOURCES := jsondiff_tests.cpp
 
 INCLUDES := .. \
-            ../3rdparty/catch-2.1.2
+            ../3rdparty/doctest-1.2.7/doctest
 
 LIBRARIES := ../build/libjsondiff.a
 
-CFLAGS := -g
+CFLAGS := -g -fpermissive
 LDFLAGS := -ljansson
 
 # Include libs here

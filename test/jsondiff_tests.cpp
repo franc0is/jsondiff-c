@@ -1,17 +1,18 @@
-#define CATCH_CONFIG_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include <catch.hpp>
+#include <doctest.h>
 #include <jsondiff.h>
 #include <jansson.h>
+#include <string>
 
 #define A_B_DIFF_TEST(_a, _b, _diff, _description) \
-TEST_CASE(_description, "[diff]") {                                     \
+TEST_CASE(_description) {                                               \
     json_t *a = json_loads(_a, JSON_ENCODE_ANY, NULL);                  \
-    REQUIRE(a != NULL);                                                 \
+    REQUIRE(a);                                                 \
     json_t *b = json_loads(_b, JSON_ENCODE_ANY, NULL);                  \
-    REQUIRE(b != NULL);                                                 \
+    REQUIRE(b);                                                 \
     json_t *expected = json_loads(_diff, JSON_ENCODE_ANY, NULL);        \
-    REQUIRE(expected != NULL);                                          \
+    REQUIRE(expected);                                          \
     json_t *diff = jsondiff_diff(a, b, 0);                              \
     std::string s1 = json_dumps(diff, JSON_DECODE_ANY);                 \
     std::string s2 = json_dumps(expected, JSON_DECODE_ANY);             \
@@ -22,7 +23,6 @@ A_B_DIFF_TEST("{\"a\":\"b\"}",
               "{\"a\":\"c\"}",
               "{\"o\": \"O\", \"v\": {\"a\": {\"o\": \"d\", \"v\": \"-1\\t+c\"}}}",
               "object, change key string");
-
 
 A_B_DIFF_TEST("{\"a\":\"b\"}",
               "{\"a\":7}",
