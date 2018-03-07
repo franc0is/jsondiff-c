@@ -169,6 +169,10 @@ prv_array_apply(json_t *a, json_t *diff, int flags)
         json_int_t index = strtoll(key, NULL, 10);
         if (op_type[0] == '-') {
             to_delete.insert(index);
+        } else if (op_type[0] == '+') {
+            // FIXME this also changes the indices
+            json_t *new_val = json_object_get(op, "v");
+            json_array_insert(c, index, new_val);
         } else {
             json_t *old_val = json_array_get(c, index);
             json_t *new_val = jsondiff_apply(old_val, op, flags);

@@ -16,14 +16,18 @@ endif
 IGNORE_ERRORS = >/dev/null 2>&1 || true
 
 SOURCES := test_diff.cpp \
-           test_apply.cpp
+           test_apply.cpp \
+           test_main.cpp
 
 INCLUDES := .. \
             ../3rdparty/doctest-1.2.7/doctest
 
+# FIXME why doesn't the compiler add that?
+DEFINES := __MAC_OS_X_VERSION_MIN_REQUIRED
+
 LIBRARIES := ../build/libjsondiff.a
 
-CFLAGS := -g -fpermissive
+CFLAGS := -g3 -fpermissive
 LDFLAGS := -ljansson
 
 # Include libs here
