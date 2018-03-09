@@ -1,7 +1,7 @@
 [requires]
-jansson/2.11@user/channel
-dmp-stl/0.1@user/channel
-argtable3/3.0.3@user/channel
+jansson/2.11@franc0is/stable
+dmp-stl/0.1@franc0is/stable
+argtable3/3.0.3@franc0is/stable
 doctest/1.2.6@bincrafters/stable
 
  [generators]
