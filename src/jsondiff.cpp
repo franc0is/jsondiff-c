@@ -170,7 +170,9 @@ prv_array_apply(json_t *a, json_t *diff, int flags)
         if (op_type[0] == '-') {
             to_delete.insert(index);
         } else if (op_type[0] == '+') {
-            // FIXME this also changes the indices
+            // currently we only insert at the end, otherwise we replace
+            // if this assumption changes it breaks our algorithm
+            assert(index == json_array_size(c));
             json_t *new_val = json_object_get(op, "v");
             json_array_insert(c, index, new_val);
         } else {
