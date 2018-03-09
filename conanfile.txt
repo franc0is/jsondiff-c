@@ -1,0 +1,7 @@
+[requires]
+jansson/2.11@user/channel
+dmp-stl/0.1@user/channel
+argtable3/3.0.3@user/channel
+
+ [generators]
+ cmake
