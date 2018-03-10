@@ -4,10 +4,6 @@ project(jsondiff-c)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-set(CMAKE_C_COMPILER "g++-7")
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_COMPILER "g++-7")
-
 add_library(jsondiff src/jsondiff.cpp)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(jsondiff ${CONAN_LIBS})
