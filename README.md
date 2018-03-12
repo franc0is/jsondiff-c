@@ -43,6 +43,7 @@ prints:
 * verify this all works on Linux & Windows
 * transform APIs (to apply a diff object to another diff object)
 * more example programs
+* continuous build/test with travis
 
 ## Building
 
@@ -76,4 +77,15 @@ After building, you can run tests by doing:
 $ cd build
 $ make test
 ```
+
+## Depedencies
+
+The jsondiff-c library dependes on a few libraries (managed via conan):
+* [jansson](https://github.com/akheron/jansson) for json parsing / building
+* [diff-match-patch-cpp-stl](https://github.com/leutloff/diff-match-patch-cpp-stl)
+  for running diff-match-patch on strings
+* [doctest](https://github.com/onqtam/doctest) for unit testing
+
+Additionally, tools & examples depend on:
+* [argtable3](https://github.com/argtable/argtable3) for argument parsing
 
