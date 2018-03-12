@@ -66,7 +66,7 @@ You can also use conan directly:
 $ mkdir build && cd build
 $ conan install ..
 $ conan build ..
-``
+```
 
 ## Running tests
 
