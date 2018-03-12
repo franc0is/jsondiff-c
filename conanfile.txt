@@ -1,8 +1,0 @@
-[requires]
-jansson/2.11@franc0is/stable
-dmp-stl/0.1@franc0is/stable
-argtable3/3.0.3@franc0is/stable
-doctest/1.2.6@bincrafters/stable
-
- [generators]
- cmake
