@@ -5,15 +5,15 @@ class JsondiffcTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure(source_folder=".")
+        cmake.build()
+
     def configure(self):
         self.settings.compiler = 'gcc'
         self.settings.compiler.version = 7
         self.settings.compiler.libcxx = 'libstdc++11'
-
-    def build(self):
-        cmake = CMake(self)
-        cmake.configure(source_folder=".", args=["-DCMAKE_C_COMPILER=gcc-7", "-DCMAKE_CXX_COMPILER=g++-7"])
-        cmake.build()
 
     def imports(self):
         self.copy("*.dll", dst="bin", src="bin")

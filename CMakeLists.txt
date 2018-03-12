@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
+
+set(CMAKE_C_COMPILER "gcc-7")
+set(CMAKE_CXX_COMPILER "g++-7")
+
 project(jsondiff-c)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

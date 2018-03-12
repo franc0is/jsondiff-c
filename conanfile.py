@@ -25,7 +25,7 @@ class JsondiffcConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure(source_folder=".", args=["-DCMAKE_C_COMPILER=gcc-7", "-DCMAKE_CXX_COMPILER=g++-7"])
+        cmake.configure(source_folder=".")
         cmake.build()
 
     def package(self):

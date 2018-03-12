@@ -1,3 +1,6 @@
+set(CMAKE_C_COMPILER "gcc-7")
+set(CMAKE_CXX_COMPILER "g++-7")
+
 project(PackageTest CXX)
 cmake_minimum_required(VERSION 2.8.12)
 
