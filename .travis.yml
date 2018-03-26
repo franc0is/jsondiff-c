@@ -23,13 +23,16 @@ before_install:
 
 # XXX swap with build matrix once you add osx
 install:
-    # Upgrade GCC
+    # Upgrade GCC XXX might not actually be needed
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
     # Install conan
-    - pip install conan
+    - sudo pip install conan
     # Automatic detection of your arch, compiler, etc.
     - conan user
-    - conan install ..
+    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+    - conan remote add franc0is https://api.bintray.com/conan/franc0is/conan
+    # FIXME for now build all from source... got to deploy more of them
+    - conan install .. -b
 
 #
 # Build steps
@@ -40,3 +43,4 @@ before_script:
 script:
     - cmake ..
     - make
+    - make test
