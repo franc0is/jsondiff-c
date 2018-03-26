@@ -1,0 +1,42 @@
+language: cpp
+
+#
+# Toolchain
+#
+compiler:
+    - gcc
+
+addons:
+  apt:
+    sources:
+      - george-edison55-precise-backports
+      - ubuntu-toolchain-r-test
+    packages:
+      - cmake-data
+      - cmake
+      - gcc-7
+      - g++-7
+
+before_install:
+    - mkdir $TRAVIS_BUILD_DIR/build
+    - cd $TRAVIS_BUILD_DIR/build
+
+# XXX swap with build matrix once you add osx
+install:
+    # Upgrade GCC
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
+    # Install conan
+    - pip install conan
+    # Automatic detection of your arch, compiler, etc.
+    - conan user
+    - conan install ..
+
+#
+# Build steps
+#
+before_script:
+    - cd $TRAVIS_BUILD_DIR/build
+
+script:
+    - cmake ..
+    - make
