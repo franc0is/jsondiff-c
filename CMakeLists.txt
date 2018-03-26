@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_C_COMPILER "gcc-7")
 set(CMAKE_CXX_COMPILER "g++-7")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(jsondiff-c)
 
