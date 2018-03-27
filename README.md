@@ -1,7 +1,7 @@
 # jsondiff-c
 An MIT-licensed C implementation of Simperium's [jsondiff](https://github.com/simperium/jsondiff) library
 
-[![Build Status](https://travis-ci.org/franc0is/jsondiff-c.png)](https://travis-ci.org/franc0is/jsondiff-c)
+[![Build Status](https://travis-ci.org/franc0is/jsondiff-c.svg?branch=master)](https://travis-ci.org/franc0is/jsondiff-c)
 
 ## Example
 
