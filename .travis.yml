@@ -4,43 +4,48 @@ language: cpp
 # Toolchain
 #
 compiler:
-    - gcc
+  - gcc
 
-addons:
-  apt:
-    sources:
-      - george-edison55-precise-backports
-      - ubuntu-toolchain-r-test
-    packages:
-      - cmake-data
-      - cmake
-      - gcc-7
-      - g++-7
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - george-edison55-precise-backports
+            - ubuntu-toolchain-r-test
+          packages:
+            - gcc-7
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew update && brew install gcc && CC=gcc-7 && CXX=g++-7"
 
 before_install:
-    - mkdir $TRAVIS_BUILD_DIR/build
-    - cd $TRAVIS_BUILD_DIR/build
+  - mkdir $TRAVIS_BUILD_DIR/build
+  - cd $TRAVIS_BUILD_DIR/build
 
-# XXX swap with build matrix once you add osx
 install:
-    # Upgrade GCC XXX might not actually be needed
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-    # Install conan
-    - sudo pip install conan
-    # Automatic detection of your arch, compiler, etc.
-    - conan user
-    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-    - conan remote add franc0is https://api.bintray.com/conan/franc0is/conan
-    # FIXME for now build all from source... got to deploy more of them
-    - conan install .. -b
+  - eval "${MATRIX_EVAL}"
+  # Install conan
+  - sudo pip install conan
+  # Automatic detection of your arch, compiler, etc.
+  - conan user
+  - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+  - conan remote add franc0is https://api.bintray.com/conan/franc0is/conan
+  # FIXME for now build all from source... got to deploy more of them
+  - conan install .. -b
 
 #
 # Build steps
 #
 before_script:
-    - cd $TRAVIS_BUILD_DIR/build
+  - cd $TRAVIS_BUILD_DIR/build
 
 script:
-    - cmake ..
-    - make
-    - make test
+  - cmake ..
+  - make
+  - make test
