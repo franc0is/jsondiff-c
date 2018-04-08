@@ -39,13 +39,14 @@ prints:
 * diff/apply APIs
 * a tool (jsondiff-tool) to diff / patch json strings on the command line
 * unit tests
+* Windows & Unix builds
+* AppVeyor & Travis continuous testing
 
 ### What's TODO
 
 * jsondiff-c on Unix currently requires gcc/g++ 7. I'll fix this at a later date.
 * transform APIs (to apply a diff object to another diff object)
 * more example programs
-* continuous build/test with ~Travis~ (done) & Appveyor
 * dependencies are build from source, need to deploy more packages to bintray
 
 ## Building
