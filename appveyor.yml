@@ -1,0 +1,19 @@
+platform:
+    - x64
+
+install:
+    - echo "Downloading conan..."
+    - set PATH=%PATH%;%PYTHON%/Scripts/
+    - pip.exe install conan
+    - conan user # Create the conan data directory
+    - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+    - conan remote add franc0is https://api.bintray.com/conan/franc0is/conan
+    - conan
+    - conan --version
+
+build_script:
+    - mkdir build
+    - cd build
+    - conan install .. -b
+    - conan build ..
+

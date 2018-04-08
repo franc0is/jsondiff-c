@@ -19,9 +19,10 @@ class JsondiffcConan(ConanFile):
     exports_sources = "*"
 
     def configure(self):
-        self.settings.compiler = 'gcc'
-        self.settings.compiler.version = 7
-        self.settings.compiler.libcxx = 'libstdc++11'
+        if self.settings.os != "Windows":
+            self.settings.compiler = 'gcc'
+            self.settings.compiler.version = 7
+            self.settings.compiler.libcxx = 'libstdc++11'
 
     def build(self):
         cmake = CMake(self)

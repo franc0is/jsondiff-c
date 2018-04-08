@@ -41,11 +41,11 @@ prints:
 
 ### What's TODO
 
-* jsondiff-c currently requires gcc/g++ 7. I'll fix this at a later date.
-* verify this all works on Linux & Windows
+* jsondiff-c on Unix currently requires gcc/g++ 7. I'll fix this at a later date.
 * transform APIs (to apply a diff object to another diff object)
 * more example programs
-* continuous build/test with travis
+* continuous build/test with ~Travis~ (done) & Appveyor
+* dependencies are build from source, need to deploy more packages to bintray
 
 ## Building
 
@@ -56,18 +56,8 @@ To build it, do the following:
 # create build folder
 $ mkdir build && cd build
 # install dependencies via conan - this requires internet access
-$ conan install ..
+$ conan install .. -b
 # generate build files
-$ cmake ..
-# build
-$ make
-```
-
-You can also use conan directly:
-
-```
-$ mkdir build && cd build
-$ conan install ..
 $ conan build ..
 ```
 
